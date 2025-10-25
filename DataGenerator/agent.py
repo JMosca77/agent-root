@@ -1,7 +1,7 @@
 import datetime
 from zoneinfo import ZoneInfo
+import json
 from google.adk.agents import Agent
-from typing import Optional
 
 import asyncio
 import uuid # For unique session IDs
@@ -38,84 +38,6 @@ def get_weather(city: str) -> dict:
             "error_message": f"Weather information for '{city}' is not available.",
         }
 
-
-def inspect_developer_portal(query: Optional[str] = None) -> dict:
-    """Inspects KeyBank's Developer Portal for information.
-
-    Args:
-        query (Optional[str]): Specific topic or area to query about. If None, returns general portal information.
-
-    Returns:
-        dict: status and information about the developer portal or specific query.
-    """
-    # This is a mock implementation. In a real scenario, you would integrate with the actual developer portal API
-    portal_info = {
-        "base_url": "https://developer.keybank.com",
-        "sections": {
-            "api_documentation": {
-                "path": "/docs",
-                "description": "Comprehensive API documentation for all KeyBank APIs"
-            },
-            "test_data": {
-                "path": "/test-data",
-                "description": "Access to test data and sandbox environments"
-            },
-            "authentication": {
-                "path": "/auth",
-                "description": "Authentication methods and security guidelines"
-            },
-            "getting_started": {
-                "path": "/getting-started",
-                "description": "Quick start guides and tutorials"
-            }
-        },
-        "available_apis": [
-            "Embedded Banking API",
-            "Payment Services API",
-            "Account Information API",
-            "Transaction Data API"
-        ]
-    }
-    
-    if query is None:
-        return {
-            "status": "success",
-            "info": {
-                "description": "KeyBank Developer Portal - Your gateway to banking APIs",
-                "base_url": portal_info["base_url"],
-                "available_apis": portal_info["available_apis"]
-            }
-        }
-    
-    query = query.lower()
-    if "api" in query:
-        return {
-            "status": "success",
-            "info": {
-                "available_apis": portal_info["available_apis"],
-                "documentation_url": f"{portal_info['base_url']}/docs"
-            }
-        }
-    elif "test" in query or "sandbox" in query:
-        return {
-            "status": "success",
-            "info": portal_info["sections"]["test_data"]
-        }
-    elif "auth" in query or "security" in query:
-        return {
-            "status": "success",
-            "info": portal_info["sections"]["authentication"]
-        }
-    elif "guide" in query or "tutorial" in query:
-        return {
-            "status": "success",
-            "info": portal_info["sections"]["getting_started"]
-        }
-    else:
-        return {
-            "status": "error",
-            "error_message": f"No specific information found for query: '{query}'"
-        }
 
 def get_current_time(city: str) -> dict:
     """Returns the current time in a specified city.
@@ -252,23 +174,21 @@ petstore_toolset = OpenAPIToolset(
     spec_str_type='json',
     # No authentication needed for httpbin.org
 )
+with open('DataGenerator/data.json') as f:
+    data_spec_string = f.read()
 
+data_toolset = OpenAPIToolset(spec_str=data_spec_string, spec_str_type='json')
 
 
 root_agent = Agent(
     name="DataGeneratorAgent",
     model="gemini-2.0-flash",
     description=(
-        "Agent to help external API consumers navigate KeyBank's Developer Portal, access documentation, and work with test data."
+        "Agent to help external API consumers inquire about test data that is available to them as well as create new test data."
     ),
     instruction=(
-        "You are a helpful agent who assists customers with KeyBank's API products and developer resources. You can help customers: \n"
-        "1. Navigate the KeyBank Developer Portal at developer.keybank.com\n"
-        "2. Find relevant API documentation and guides\n"
-        "3. Access test data and sandbox environments\n"
-        "4. Understand authentication and security requirements\n"
-        "5. Locate specific API endpoints and their usage\n"
-        "Use the available tools to provide accurate information about KeyBank's developer resources and help customers find what they need."
+        "You are a helpful agent who can help customers with KeyBank's Embedded API products. You can help customers inquire about test data that is available to them "
+        "as well as create new test data. "
     ),
-    tools=[petstore_toolset, get_weather, get_current_time, inspect_developer_portal],
+    tools=[data_toolset,petstore_toolset, get_weather, get_current_time],
 )
