@@ -1,0 +1,6 @@
+#first set env variables
+set GOOGLE_GENAI_USE_VERTEXAI=TRUE
+set GOOGLE_CLOUD_PROJECT=haunted-endpoints
+set GOOGLE_CLOUD_LOCATION=us-central1
+
+gcloud run deploy capital-agent-service --source . --region %GOOGLE_CLOUD_LOCATION% --project %GOOGLE_CLOUD_PROJECT% --allow-unauthenticated --set-env-vars="%GOOGLE_CLOUD_PROJECT=%GOOGLE_CLOUD_PROJECT%,GOOGLE_CLOUD_LOCATION=%GOOGLE_CLOUD_LOCATION%,GOOGLE_GENAI_USE_VERTEXAI=%GOOGLE_GENAI_USE_VERTEXAI%"

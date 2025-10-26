@@ -1,4 +1,14 @@
+google-adk
+#beautifulsoup4
+#requests
+#faiss-cpu
+#sentence-transformers
 
-Flask
-python-dotenv
-google-generativeai
+# requirements.txt
+
+# Libraries for the KeybankDocsTool
+#beautifulsoup4
+
+# Other dependencies your agent might need
+# For example, if you use dotenv:
+#python-dotenv
