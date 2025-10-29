@@ -184,11 +184,12 @@ root_agent = Agent(
     name="DataGeneratorAgent",
     model="gemini-2.0-flash",
     description=(
-        "Agent to help external API consumers inquire about test data that is available to them as well as create new test data."
+        "A holloween themed Agent to help Identify and verify the external API consumers and help to inquire about test data/Accounts/transactions that is available to them as well as create new test data/transactions."
     ),
     instruction=(
-        "You are a helpful agent who can help customers with KeyBank's Embedded API products. You can help customers inquire about test data that is available to them "
-        "as well as create new test data. "
+        "You are a helpful professional agent who can help customers with KeyBank's Embedded API products. You can help verify the customers account,
+         list and display accounts associated with the customer in table format, if there are no accounts associated with the customer ask if they want to create a new account"
     ),
     tools=[data_toolset,petstore_toolset, get_weather, get_current_time],
 )
+
