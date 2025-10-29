@@ -1,0 +1,112 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "KeyBank's Embedded API - Data Generator",
+        "version": "1.0.1",
+        "description": "APIs for generating test data for KeyBank's Embedded API products. Current supported data types include customer and account data."
+    },
+    "servers": [
+        {
+            "url": "https://haunted-endpoints.uc.r.appspot.com",
+            "description": "Mock server (httpbin.org)"
+        }
+    ],
+    "paths": {
+        "/accounts": {
+            "get": {
+                "summary": "Get all accounts",
+                "responses": {
+                    "200": {
+                        "description": "A list of accounts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Account"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new account",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAccount"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The created account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Account": {
+                "type": "object",
+                "properties": {
+                    "clientId": {
+                        "type": "string",
+                        "description": "this is the 'id'"
+                    },
+                    "accountNumber": {
+                        "type": "string",
+                        "description": "This is the account's unique number",
+                        "maxLength": 16
+                    },
+                    "accounType": {
+                        "type": "string",
+                        "enum": [
+                            "CHECKING",
+                            "SAVINGS",
+                            "SWEEP",
+                            "ZERO BALANCE"
+                        ],
+                        "description": "The type of accountNumber"
+                    },
+                    "availableBalance": {
+                        "type": "number",
+                        "description": "The account's current balance"
+                    },
+                    "openingBalance": {
+                        "type": "number",
+                        "description": "The account's balance at the beginning of the business day"
+                    },
+                    "closingBalance": {
+                        "type": "number",
+                        "description": "The account's balance at the end of the business day"
+                    }
+                }
+            },
+            "CreateAccount": {
+                "type": "object",
+                "properties": {
+                    "clientName": {
+                        "type": "string"
+                    },
+                    "account": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
