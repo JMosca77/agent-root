@@ -56,15 +56,133 @@
                     }
                 }
             }
+        },
+        "/transactions": {
+            "get": {
+                "summary": "Get all transactions",
+                "responses": {
+                    "200": {
+                        "description": "A list of all transactions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Transaction"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new transaction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTransaction"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The created account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Transaction"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{accountId}": {
+            "get": {
+                "summary": "Get all transactions for a specific account, by specifying the accountId",
+                "parameters": [
+                    {
+                        "name": "accountId",
+                        "in": "path",
+                        "description": "The ID of the account to retrieve transactions for",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of all transactions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Transaction"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{accountId}/transactionType": {
+            "get": {
+                "summary": "Get transactions by an account id and transaction type",
+                "parameters": [
+                    {
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "transactionType",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of transactions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Transaction"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-    },
+  },
     "components": {
         "schemas": {
             "Account": {
                 "type": "object",
                 "properties": {
+                    "accountId": {
+                        "type": "number",
+                        "description": "this is the 'id'"
+                    },
                     "clientId": {
-                        "type": "string",
+                        "type": "number",
                         "description": "this is the 'id'"
                     },
                     "accountNumber": {
@@ -72,7 +190,7 @@
                         "description": "This is the account's unique number",
                         "maxLength": 16
                     },
-                    "accounType": {
+                    "accountType": {
                         "type": "string",
                         "enum": [
                             "CHECKING",
@@ -99,11 +217,140 @@
             "CreateAccount": {
                 "type": "object",
                 "properties": {
-                    "clientName": {
-                        "type": "string"
+                    "clientId": {
+                        "type": "number",
+                        "description": "this is the 'id'"
                     },
-                    "account": {
-                        "type": "string"
+                    "accountNumber": {
+                        "type": "string",
+                        "description": "This is the account's unique number",
+                        "maxLength": 16
+                    },
+                    "accountType": {
+                        "type": "string",
+                        "enum": [
+                            "CHECKING",
+                            "SAVINGS",
+                            "SWEEP",
+                            "ZERO BALANCE"
+                        ],
+                        "description": "The type of accountNumber"
+                    },
+                    "availableBalance": {
+                        "type": "number",
+                        "description": "The account's current balance"
+                    },
+                    "openingBalance": {
+                        "type": "number",
+                        "description": "The account's balance at the beginning of the business day"
+                    },
+                    "closingBalance": {
+                        "type": "number",
+                        "description": "The account's balance at the end of the business day"
+                    }
+                },
+                "required": [
+                    "clientId",
+                    "accountNumber",
+                    "accountType",
+                    "availableBalance",
+                    "openingBalance",
+                    "closingBalance"
+                ]   
+            },
+            "Transaction": {
+                "type": "object",
+                "properties": {
+                    "accountId": {
+                        "type": "number",
+                        "description": "this is the 'id'"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "description": "this is the 'id' of the transaction"
+                    },
+                    "transactionDate": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "The date the resource was created (e.g., 2025-10-29)."
+                    },
+                    "transactionType": {
+                        "type": "string",
+                        "enum": [
+                            "RTP",
+                            "WIRE",
+                            "ACH",
+                            "CHECK"
+                        ],
+                        "description": "The type of transaction"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "The amount of the transaction"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Describes the transaction"
+                    },
+                    "creditOrDebit": {
+                        "type": "string",
+                        "enum": [
+                            "CREDIT",
+                            "DEBIT"
+                        ]
+                    }
+                }
+            },
+            "CreateTransaction": {
+                "type": "object",
+                "required": [
+                    "accountId",
+                    "transactionId",
+                    "transactionDate",
+                    "transactionType",
+                    "amount",
+                    "description",
+                    "creditOrDebit"
+                ],
+                "properties": {
+                    "accountId": {
+                        "type": "number",
+                        "description": "this is the 'id'"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "description": "this is the 'id' of the transaction",
+                        "format": "uuid"
+                    },                    
+                    "transactionDate": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "The date the resource was created (e.g., 2025-10-29)."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Describes the transaction"
+                    },
+                    "transactionType": {
+                        "type": "string",
+                        "enum": [
+                            "RTP",
+                            "WIRE",
+                            "ACH",
+                            "CHECK"
+                        ],
+                        "description": "The type of transaction"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "The amount of the transaction"
+                    },
+                    "creditOrDebit": {
+                        "type": "string",
+                        "enum": [
+                            "CREDIT",
+                            "DEBIT"
+                        ]
                     }
                 }
             }

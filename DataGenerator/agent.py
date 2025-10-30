@@ -66,114 +66,6 @@ def get_current_time(city: str) -> dict:
     )
     return {"status": "success", "report": report}
 
-# --- Sample OpenAPI Specification (JSON String) ---
-# A basic Pet Store API example using httpbin.org as a mock server
-openapi_spec_string = """
-{
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Simple Pet Store API (Mock)",
-    "version": "1.0.1",
-    "description": "An API to manage pets in a store, using httpbin for responses."
-  },
-  "servers": [
-    {
-      "url": "https://randomuser.me",
-      "description": "Mock server (httpbin.org)"
-    }
-  ],
-  "paths": {
-    "/api": {
-      "get": {
-        "summary": "List all pets (Simulated)",
-        "operationId": "listPets",
-        "description": "Simulates returning a list of pets. Uses httpbin's /get endpoint which echoes query parameters.",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Maximum number of pets to return",
-            "required": false,
-            "schema": { "type": "integer", "format": "int32" }
-          },
-          {
-             "name": "status",
-             "in": "query",
-             "description": "Filter pets by status",
-             "required": false,
-             "schema": { "type": "string", "enum": ["available", "pending", "sold"] }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of pets (echoed query params).",
-            "content": { "application/json": { "schema": { "type": "object" } } }
-          }
-        }
-      }
-    },
-    "/post": {
-      "post": {
-        "summary": "Create a pet (Simulated)",
-        "operationId": "createPet",
-        "description": "Simulates adding a new pet. Uses httpbin's /post endpoint which echoes the request body.",
-        "requestBody": {
-          "description": "Pet object to add",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["name"],
-                "properties": {
-                  "name": {"type": "string", "description": "Name of the pet"},
-                  "tag": {"type": "string", "description": "Optional tag for the pet"}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Pet created successfully (echoed request body).",
-            "content": { "application/json": { "schema": { "type": "object" } } }
-          }
-        }
-      }
-    },
-    "/get?petId={petId}": {
-      "get": {
-        "summary": "Info for a specific pet (Simulated)",
-        "operationId": "showPetById",
-        "description": "Simulates returning info for a pet ID. Uses httpbin's /get endpoint.",
-        "parameters": [
-          {
-            "name": "petId",
-            "in": "path",
-            "description": "This is actually passed as a query param to httpbin /get",
-            "required": true,
-            "schema": { "type": "integer", "format": "int64" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Information about the pet (echoed query params)",
-            "content": { "application/json": { "schema": { "type": "object" } } }
-          },
-          "404": { "description": "Pet not found (simulated)" }
-        }
-      }
-    }
-  }
-}
-"""
-
-# --- Create OpenAPIToolset ---
-petstore_toolset = OpenAPIToolset(
-    spec_str=openapi_spec_string,
-    spec_str_type='json',
-    # No authentication needed for httpbin.org
-)
 with open('DataGenerator/data.json') as f:
     data_spec_string = f.read()
 
@@ -184,12 +76,16 @@ root_agent = Agent(
     name="DataGeneratorAgent",
     model="gemini-2.0-flash",
     description=(
-        "A holloween themed Agent to help Identify and verify the external API consumers and help to inquire about test data/Accounts/transactions that is available to them as well as create new test data/transactions."
+        """You are the product of a Halloween themed hackathon from KeyBank. Your primary function is to assist developers and testers in generating, identifying, and verifying test data related to KeyBank's Embedded API products.
+        Any data you create should be mildly spooky or Halloween themed to align with the event's theme.
+        You should be able to generate realistic test data for accounts, transactions, and customers, ensuring that the data adheres to the expected formats and constraints of KeyBank's Embedded API."""
     ),
     instruction=(
-        "You are a helpful professional agent who can help customers with KeyBank's Embedded API products. You can help verify the customers account,
-         list and display accounts associated with the customer in table format, if there are no accounts associated with the customer ask if they want to create a new account"
+        """You are a helpful professional agent who can help customers with KeyBank's Embedded API products. You can help verify the customers account, 
+         list and display accounts associated with the customer, if there are no accounts associated with the customer ask if they want to create a new account.
+         After you give a response, you should always check if the customer wants to create transactions for an account or create another account.
+         You should always respond in a friendly and professional manner, while keeping the Halloween theme in mind."""
     ),
-    tools=[data_toolset,petstore_toolset, get_weather, get_current_time],
+    tools=[data_toolset],
 )
 
